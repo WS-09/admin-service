@@ -10,12 +10,24 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  // 🔥 Fire-and-forget (non-blocking)
-  fetch(`${process.env.GAS_URL}?warm=1`)
-    .then(() => console.log("🔥 GAS warmed"))
-    .catch(err => console.error("❌ GAS warm failed:", err.message));
-
   res.send("Server is running 🚀");
+});
+
+app.get("/gas-warm", async (req, res) => {
+  try {
+    await fetch(`${process.env.GAS_URL}?warm=1`);
+    console.log("🔥 GAS warmed");
+
+    res.json({ success: true, message: "GAS warmed" });
+
+  } catch (err) {
+    console.error("❌ GAS warm failed:", err.message);
+
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
 });
 
 // Helper: Handle errors cleanly
