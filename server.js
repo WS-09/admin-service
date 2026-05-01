@@ -17,16 +17,10 @@ app.get("/gas-warm", async (req, res) => {
   try {
     await fetch(`${process.env.GAS_URL}?warm=1`);
     console.log("🔥 GAS warmed");
-
-    res.json({ success: true, message: "GAS warmed" });
-
+    res.send("GAS warmed");
   } catch (err) {
     console.error("❌ GAS warm failed:", err.message);
-
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
+    res.status(500).send("Failed");
   }
 });
 
@@ -47,7 +41,8 @@ function handleError(error) {
   if (error.code === "auth/weak-password") {
     return {
       case: "weak_password",
-      error: "Password must be at least 8 characters with uppercase, lowercase, and numbers",
+      error:
+        "Password must be at least 8 characters with uppercase, lowercase, and numbers",
     };
   }
 
@@ -160,7 +155,6 @@ app.post("/create-user", async (req, res) => {
       message: "User created successfully",
       uid,
     });
-
   } catch (error) {
     const err = handleError(error);
 
@@ -200,13 +194,11 @@ app.post("/disable-user", async (req, res) => {
     res.json({
       message: "User disabled successfully",
     });
-
   } catch (error) {
     const err = handleError(error);
     res.status(400).json(err);
   }
 });
-
 
 app.post("/enable-user", async (req, res) => {
   const { uid } = req.body;
@@ -240,7 +232,6 @@ app.post("/enable-user", async (req, res) => {
     res.json({
       message: "User enabled successfully",
     });
-
   } catch (error) {
     const err = handleError(error);
     res.status(400).json(err);
