@@ -79,20 +79,20 @@ app.post("/create-user", async (req, res) => {
 
   try {
     // 🔐 1. Verify token
-    // const token = req.headers.authorization?.split("Bearer ")[1];
+    const token = req.headers.authorization?.split("Bearer ")[1];
 
-    // if (!token) {
-    //   throw new Error("No token provided");
-    // }
+    if (!token) {
+      throw new Error("No token provided");
+    }
 
-    // const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await admin.auth().verifyIdToken(token);
 
     // 🔐 2. Check admin role from Firestore
-    // const userDoc = await db.collection("users").doc(decoded.uid).get();
+    const userDoc = await db.collection("users").doc(decoded.uid).get();
 
-    // if (!userDoc.exists || userDoc.data().role !== "Admin") {
-    //   throw new Error("Only admin can create users");
-    // }
+    if (!userDoc.exists || userDoc.data().role !== "Admin") {
+      throw new Error("Only admin can create users");
+    }
 
     // ✅ 3. Validate input
     if (!email || !password || !full_name || !role) {
@@ -135,6 +135,7 @@ app.post("/create-user", async (req, res) => {
     // 👉 Add primary_school if needed
     if (role === "Teacher" || role === "Therapist") {
       userData.primary_school = primary_school;
+      userData.profile_image = "https://iili.io/30oSNn9.png";
     }
 
     // 🔥 7. Save to Firestore
@@ -162,21 +163,22 @@ app.post("/create-user", async (req, res) => {
   }
 });
 
+
 app.post("/disable-user", async (req, res) => {
   const { uid } = req.body;
 
   try {
     // 🔐 Verify token
-    // const token = req.headers.authorization?.split("Bearer ")[1];
-    // if (!token) throw new Error("No token provided");
+    const token = req.headers.authorization?.split("Bearer ")[1];
+    if (!token) throw new Error("No token provided");
 
-    // const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await admin.auth().verifyIdToken(token);
 
     // 🔐 Check admin
-    // const adminDoc = await db.collection("users").doc(decoded.uid).get();
-    // if (!adminDoc.exists || adminDoc.data().role !== "Admin") {
-    //   throw new Error("Only admin can disable users");
-    // }
+    const adminDoc = await db.collection("users").doc(decoded.uid).get();
+    if (!adminDoc.exists || adminDoc.data().role !== "Admin") {
+      throw new Error("Only admin can disable users");
+    }
 
     if (!uid) throw new Error("Missing uid");
 
@@ -200,21 +202,22 @@ app.post("/disable-user", async (req, res) => {
   }
 });
 
+
 app.post("/enable-user", async (req, res) => {
   const { uid } = req.body;
 
   try {
     // 🔐 Verify token
-    // const token = req.headers.authorization?.split("Bearer ")[1];
-    // if (!token) throw new Error("No token provided");
+    const token = req.headers.authorization?.split("Bearer ")[1];
+    if (!token) throw new Error("No token provided");
 
-    // const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await admin.auth().verifyIdToken(token);
 
     // 🔐 Check admin
-    // const adminDoc = await db.collection("users").doc(decoded.uid).get();
-    // if (!adminDoc.exists || adminDoc.data().role !== "Admin") {
-    //   throw new Error("Only admin can enable users");
-    // }
+    const adminDoc = await db.collection("users").doc(decoded.uid).get();
+    if (!adminDoc.exists || adminDoc.data().role !== "Admin") {
+      throw new Error("Only admin can enable users");
+    }
 
     if (!uid) throw new Error("Missing uid");
 
@@ -237,6 +240,59 @@ app.post("/enable-user", async (req, res) => {
     res.status(400).json(err);
   }
 });
+
+
+app.post("/send-notification", async (req, res) => {
+  try {
+    const { title, body, payload } = req.body;
+
+    // 🔐 Verify Firebase token
+    const token = req.headers.authorization?.split("Bearer ")[1];
+
+    if (!token) {
+      throw new Error("No token provided");
+    }
+
+    const decoded = await admin.auth().verifyIdToken(token);
+
+    // 🔐 Check admin role
+    const adminDoc = await db.collection("users").doc(decoded.uid).get();
+
+    if (!adminDoc.exists || adminDoc.data().role !== "Admin") {
+      throw new Error("Only admins can send notifications");
+    }
+
+    // Data-only FCM message
+    const message = {
+      topic: "all",
+      data: {
+        title: title || "",
+        body: body || "",
+        payload: payload || "",
+      },
+    };
+
+    // Send notification
+    const response = await admin.messaging().send(message);
+
+    console.log("✅ Notification sent:", response);
+
+    res.json({
+      success: true,
+      messageId: response,
+    });
+
+  } catch (error) {
+    console.error("❌ Notification error:", error.message);
+
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+
 
 const PORT = process.env.PORT || 3000;
 
