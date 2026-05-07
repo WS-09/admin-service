@@ -12,6 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "agentkeepalive": "^4.6.0",
+    "compression": "^1.8.1",
+    "connect-timeout": "^1.9.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
