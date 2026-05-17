@@ -170,7 +170,7 @@ async function verifyAdmin(req, res, next) {
 /**
  * Create user
  */
-app.post("/create-user", async (req, res) => {
+app.post("/create-user", verifyAdmin, async (req, res) => {
   const {
     email,
     password,
