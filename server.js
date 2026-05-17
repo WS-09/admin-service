@@ -170,7 +170,7 @@ async function verifyAdmin(req, res, next) {
 /**
  * Create user
  */
-app.post("/create-user", verifyAdmin, async (req, res) => {
+app.post("/create-user", async (req, res) => {
   const {
     email,
     password,
@@ -227,8 +227,6 @@ app.post("/create-user", verifyAdmin, async (req, res) => {
       email,
       role,
       status: "active",
-      // new_reports: false,
-      new_meetings: false,
       created_at: now,
       updated_at: now,
     };
@@ -238,6 +236,7 @@ app.post("/create-user", verifyAdmin, async (req, res) => {
       role === "Therapist"
     ) {
       userData.primary_school = primary_school;
+      userData.new_meetings = false,
 
       userData.profile_image =
         "https://iili.io/30oSNn9.png";
