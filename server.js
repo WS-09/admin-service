@@ -240,6 +240,8 @@ app.post("/create-user", verifyAdmin, async (req, res) => {
 
       userData.profile_image =
         "https://iili.io/30oSNn9.png";
+
+      userData.checked_by_admin = true;
     }
 
     /**
