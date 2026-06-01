@@ -242,6 +242,8 @@ app.post("/create-user", verifyAdmin, async (req, res) => {
         "https://iili.io/30oSNn9.png";
 
       userData.checked_by_admin = true;
+
+      if(role === Therapist) userData.report_count = 0;
     }
 
     /**
