@@ -243,7 +243,7 @@ app.post("/create-user", verifyAdmin, async (req, res) => {
 
       userData.checked_by_admin = true;
 
-      if(role === Therapist) userData.report_count = 0;
+      if(role === "Therapist") userData.report_count = 0;
     }
 
     /**
