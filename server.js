@@ -378,6 +378,37 @@ app.post(
 );
 
 /**
+ * Update user password
+ */
+app.post(
+  "/update-password",
+  verifyAdmin,
+  async (req, res) => {
+    try {
+      const { uid, password } = req.body;
+
+      if (!uid || !password) {
+        throw new Error("Missing uid or password");
+      }
+
+      await admin.auth().updateUser(uid, {
+        password: password,
+      });
+
+      res.json({
+        success: true,
+        message: "Password updated successfully",
+      });
+
+    } catch (error) {
+      const err = handleError(error);
+
+      res.status(400).json(err);
+    }
+  }
+);
+
+/**
  * Send notification
  */
 app.post(
