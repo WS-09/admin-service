@@ -409,6 +409,35 @@ app.post(
 );
 
 /**
+ * Delete user
+ */
+app.post(
+  "/delete-user",
+  verifyAdmin,
+  async (req, res) => {
+    try {
+      const { uid } = req.body;
+
+      if (!uid) {
+        throw new Error("Missing uid");
+      }
+
+      await admin.auth().deleteUser(uid);
+      await db.collection("users").doc(uid).delete();
+
+      res.json({
+        success: true,
+        message: "User deleted successfully",
+      });
+
+    } catch (error) {
+      const err = handleError(error);
+      res.status(400).json(err);
+    }
+  }
+);
+
+/**
  * Send notification
  */
 app.post(
